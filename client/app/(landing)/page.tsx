@@ -1,12 +1,20 @@
+import Faq from "../_components/landing/faq";
+import Features from "../_components/landing/features";
+import Footer from "../_components/landing/footer";
 import Header from "../_components/landing/header";
 import Hero from "../_components/landing/hero";
+import Testimonials from "../_components/landing/testimonials";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+    <div className="bg-[#ffffff] text-gray-600">
       <Header />
       <main>
         <Hero />
+        <Features />
+        <Testimonials />
+        <Faq />
+        <Footer />
       </main>
     </div>
   );

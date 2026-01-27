@@ -79,10 +79,10 @@ const Footer = () => {
                     </h3>
                     <ul className='space-y-2'>
                         <li>
-                            <FooterLink href="/about">About Us</FooterLink>
+                            <FooterLink href="#">About Us</FooterLink>
                         </li>
                         <li>
-                            <FooterLink href="/contact">Contact</FooterLink>
+                            <FooterLink href="#">Our team</FooterLink>
                         </li>
                     </ul>
                 </div>
@@ -105,7 +105,7 @@ const Footer = () => {
                     <p className='text-gray-400'>
                         &copy; {new Date().getFullYear()} Billam. All rights reserved.
                     </p>
-                    <div className='flex space-4'>
+                    <div className='flex space-x-4'>
                         <SocialLink href="https://twitter.com/yourprofile">
                             <Twitter className='w-5 h-5' />
                         </SocialLink>

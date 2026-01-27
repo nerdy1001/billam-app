@@ -27,7 +27,7 @@ const FaqItem: React.FC<FaqItemProps> = ({ faq, isOpen, onClick }) => {
                 <ChevronDown className={cn('w-6 h-6 text-gray-400 transition-transform duration-300', isOpen ? 'transform rotate-100': '')} />
             </Button>
             {isOpen && (
-                <div className="px-6 pt-6 pb-6 text-gray-600 leading-relaxed border-t border-gray-100">
+                <div className="px-6 pt-6 pb-6 text-gray-600 leading-relaxed border-t border-gray-100 transition-transform duration-300">
                     {faq.answer}
                 </div>
             )}

@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import ProfileDropdown from '../profile-dropdown';
 import { useRouter } from 'next/navigation';
+import { useSession } from '@/lib/auth-client';
 
 const Header = () => {
 
@@ -17,6 +18,9 @@ const Header = () => {
     const router = useRouter();
 
     const isAuthenticated = false; // Replace with actual authentication logic
+
+    const session = useSession();
+
     const user = {
         name: "John Doe",
         email: "john.doe@example.com",
@@ -60,27 +64,27 @@ const Header = () => {
                     </a>
                 </div>
                 <div className='hidden lg:flex items-center space-x-4'>
-                   {isAuthenticated ? (
+                   {session ? (
                     <>
                         <ProfileDropdown
-                            id="xyz"
+                            id={session.data?.user.id!}
                             isOpen={profileDropdownOpen}
                             onToggle={(e: React.MouseEvent<HTMLButtonElement>) => {
                                 e.stopPropagation();
                                 setProfileDropdownOpen(!profileDropdownOpen);
                             }}
-                            avatar={user?.avatar || ''}
-                            companyName={user?.name || ''}
-                            email={user?.email || ''}
+                            avatar={session.data?.user.image || ''}
+                            companyName={session.data?.user.name || ''}
+                            email={session.data?.user.email || ''}
                             onLogout={logout}
                         />
                     </>
                    ): (
                     <>
-                        <Link href="/login" className='text-black hover:text-gray-900 font-medium transition-colors duration-200'>
+                        <Link href="/auth/login" className='text-black hover:text-gray-900 font-medium transition-colors duration-200'>
                             Login
                         </Link>
-                        <Link href="/signup" className='bg-linear-to-r from-blue-950 to-[#1E3A8A] hover:bg-gray-600 text-white px-6 py-2.5 font-medium transition-all duration-200 hover:scale-105 shadow-md rounded-md'>
+                        <Link href="/auth/signup" className='bg-linear-to-r from-blue-950 to-[#1E3A8A] hover:bg-gray-600 text-white px-6 py-2.5 font-medium transition-all duration-200 hover:scale-105 shadow-md rounded-md'>
                             Sign Up
                         </Link>
                     </>
@@ -119,10 +123,10 @@ const Header = () => {
                         FAQ
                     </a>
                     <div className='border-t border-gray-200 my-2'></div>
-                    {isAuthenticated ? (
+                    {session ? (
                         <div className='p-4'>
                             <Button
-                                onClick={() => router.push('/dashboard/xyz')}
+                                onClick={() => router.push("/dashboard")}
                             >
                                 Go to Dashboard
                             </Button>

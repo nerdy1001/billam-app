@@ -101,7 +101,7 @@ const Footer = () => {
                 </div>
             </div>
             <div className='border-t border-gray-800 py-8 mt-16'>
-                <div className='flex flex-col md:flex-row justify-between items-center md:space-y-0'>
+                <div className='flex flex-col md:flex-row justify-between items-center md:space-y-0 space-y-4'>
                     <p className='text-gray-400'>
                         &copy; {new Date().getFullYear()} Billam. All rights reserved.
                     </p>

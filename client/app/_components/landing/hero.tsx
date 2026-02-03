@@ -25,7 +25,7 @@ const Hero = () => {
                             Go to dashboard
                         </Link>
                     ): (
-                        <Link href="/signup" className="bg-linear-to-r from-[#1E3A8A] to-blue-900 text-white px-8 py-3 rounded-md font-bold text-base sm:text-lg hover:bg-gray-900 transition-all duration-200 hover:scale-105 hover:shadow-2xl transform">
+                        <Link href="/auth/signup" className="bg-linear-to-r from-[#1E3A8A] to-blue-900 text-white px-8 py-3 rounded-md font-bold text-base sm:text-lg hover:bg-gray-900 transition-all duration-200 hover:scale-105 hover:shadow-2xl transform">
                             Get Started
                         </Link>
                     )}

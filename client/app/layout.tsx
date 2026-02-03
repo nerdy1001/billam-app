@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { ReactQueryProvider } from "./providers/react-query-provider";
 
 const inter = Inter({
   variable: "--font-inter-tight",
@@ -21,10 +22,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.className} antialiased`}
+        className={`${inter.className} tracking-tight antialiased`}
       >
-        {children}
-        <Toaster richColors />
+        <ReactQueryProvider>
+          {children}
+          <Toaster richColors />
+        </ReactQueryProvider>
       </body>
     </html>
   );

@@ -150,3 +150,8 @@ Dockerfile.dev
 .dockerignore
 .npmrc
 Jenkinsfile
+
+generated
+/lib/generated/prisma
+
+/generated/prisma

@@ -15,13 +15,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
-import { FileText, ImageIcon } from "lucide-react";
+import { CircleAlert, FileText, Loader2, Lock, Mail, User2 } from "lucide-react";
 import { Manrope } from "next/font/google";
 import Image from "next/image";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
 
 const logoFont = Manrope({ subsets: ['latin'], weight: '700' });
 
-const signUpSchema = z.object({
+const signUpFormSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, { message: "Name is required" })
+    .max(100, { message: "Name must be less than 100 characters" }),
   email: z
     .string()
     .trim()
@@ -34,59 +43,119 @@ const signUpSchema = z.object({
     .max(100, { message: "Password must be less than 100 characters" }),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
+  error: "Passwords don't match",
   path: ["confirmPassword"],
-});
+})
 
-type SignUpFormValues = z.infer<typeof signUpSchema>;
+const signUpPayloadSchema = signUpFormSchema.transform(
+  ({ confirmPassword, ...rest }) => rest
+);
+
+export type SignUpFormValues = z.infer<typeof signUpFormSchema>;
+export type SignUpPayload = z.infer<typeof signUpPayloadSchema>;
 
 const SignUp = () => {
+
+  const router = useRouter();
+
   const form = useForm<SignUpFormValues>({
-    resolver: zodResolver(signUpSchema),
+    resolver: zodResolver(signUpFormSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
-      confirmPassword: "",
+      confirmPassword: ""
     },
   });
 
-  const onSubmit = (data: SignUpFormValues) => {
-    console.log("Form submitted:", data);
-    // Handle signup logic here
+  const { mutate: signUp, isPending: isProcessing } = useMutation({
+    mutationFn: async ( data: SignUpPayload ) => {
+      await authClient.signUp.email(
+        {
+          name: data.name,
+          email: data.email,
+          password: data.password,
+        },
+        {
+          onSuccess: () => {
+            router.push("/auth/email-sent")
+          },
+          onError: (ctx) => {
+            toast.error(ctx.error.message);
+          },
+        }
+      );
+    }
+  })
+
+  const signInWithGoogle = async () => {
+    await authClient.signIn.social(
+      {
+        provider: "google",
+        callbackURL: "/dashboard",
+      },
+      {
+        onError: (ctx) => {
+          toast.error(ctx.error.message);
+        }
+      }
+    );
   };
 
-  return (
+  const onSubmitSignupForm = async (data: SignUpFormValues) => {
+    signUp(data)
+  }
+
+    return (
     <div className="min-h-screen flex">
       {/* Left Side - Form */}
-      <div className="w-full lg:w-1/2 xl:w-1/3 flex flex-col px-4 md:px-16 lg:px-8 xl:px-20">
+      <div className="w-full lg:w-1/2 xl:w-1/3 flex flex-col px-8 md:px-16 lg:px-8 xl:px-20">
         {/* Logo */}
-        <div className="my-16 flex items-center justify-center mx-auto">
-            <div className='flex items-center space-x-2'>
-                <div className='w-8 h-8 bg-[#1E3A8A] rounded-sm flex items-center justify-center'> 
-                    <FileText className='w-4 h-4 text-white' />
-                </div>
-                <span className={`text-4xl font-bold text-gray-900 ${logoFont.className}`}>
-                    Billam
-                </span>
+        <div className="my-12 flex items-center justify-center mx-auto">
+          <div className='flex items-center space-x-2'>
+            <div className='w-8 h-8 bg-[#1E3A8A] rounded-sm flex items-center justify-center'> 
+              <FileText className='w-4 h-4 text-white' />
             </div>
+            <span className={`text-4xl font-bold text-gray-900 ${logoFont.className}`}>
+              Billam
+            </span>
+          </div>
         </div>
+
+        
 
         {/* Form Container */}
         <div className="flex flex-col justify-center max-w-md mx-auto w-full">
-            <h1 className="text-xl font-bold mb-16 text-center text-gray-700">
-                Create an account
-            </h1>
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <Button variant="google" className="w-full h-12 text-gray-700 cursor-pointer">
-                <div className="h-5 w-5 mr-2">
-                    <Image src="/google-icon.png" width={20} height={20} alt="Google Icon" />
-                </div>
-                Continue with Google
-            </Button>
-            
+          <h1 className="text-xl font-bold mb-12 text-center text-gray-700">
+            Create an account
+          </h1>
+          <Button onClick={signInWithGoogle} variant="google" className="w-full h-12 text-gray-700 cursor-pointer">
+            <div className="h-5 w-5 mr-2">
+              <Image src="/google-icon.png" width={20} height={20} alt="Google Icon" />
+            </div>
+            Continue with Google
+          </Button>
           <Separator className="my-8" />
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmitSignupForm)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-700 font-normal">
+                      Name
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <User2 className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                        <Input type="text" {...field} className="h-12 border-border bg-card pl-10 pr-10" placeholder="John Doe" />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
           
               <FormField
@@ -98,7 +167,10 @@ const SignUp = () => {
                       Email
                     </FormLabel>
                     <FormControl>
-                      <Input type="email" {...field} className="h-12" />
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                        <Input type="email" {...field} className="h-12 border-border bg-card pl-10 pr-10" placeholder="email@example.com" />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -114,7 +186,10 @@ const SignUp = () => {
                       Password
                     </FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} className="h-12" />
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                        <Input type="password" {...field} className="h-12 border-border bg-card pl-10 pr-10" placeholder="Create a password" />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -130,22 +205,27 @@ const SignUp = () => {
                       Confirm Password
                     </FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} className="h-12" />
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                        <Input type="password" {...field} className="h-12 border-border bg-card pl-10 pr-10" placeholder="Confirm your password" />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <Button type="submit" variant="signup" className="w-full h-12 mt-2 py-3 bg-[#1E3A8A] hover:bg-[#081a4c] text-white cursor-pointer">
-                Sign up
+              <Button type="submit" variant="signup" disabled={isProcessing} className="w-full h-12 mt-2 py-3 bg-[#1E3A8A] hover:bg-[#081a4c] text-white cursor-pointer">
+                {isProcessing ? (
+                  <Loader2 className='size-8 animate-spin text-white' />
+                ) : 'Create an account'}
               </Button>
             </form>
           </Form>
 
           <p className="text-center mt-6 text-gray-700">
             Already have an account?{" "}
-            <Link href="/login" className="underline font-bold cursor-pointer text-[#1E3A8A] hover:text-[#081a4c] transition-colors">
+            <Link href="/auth/login" className="underline font-bold cursor-pointer text-[#1E3A8A] hover:text-[#081a4c] transition-colors">
               Log In
             </Link>
           </p>
@@ -153,7 +233,7 @@ const SignUp = () => {
 
         {/* Footer */}
         <div className="mt-auto pt-8">
-          <p className="text-sm text-muted-foreground">© 2026 Billam</p>
+          <p className="text-sm text-muted-foreground"> &copy; {new Date().getFullYear()} Billam.</p>
         </div>
       </div>
 

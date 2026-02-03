@@ -8,8 +8,13 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "placehold.co",
       },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
     ],
   },
+  serverExternalPackages: ["@node-rs/argon2"]
 };
 
 export default nextConfig;

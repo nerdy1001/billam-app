@@ -35,7 +35,7 @@ const ProfileDropdown = ({
             className='flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-50 transition-colors duration-200 cursor-pointer'
         >
             {avatar ? (
-                <Image src={avatar} alt='avatar' className='' />
+                <Image src={avatar} alt='avatar' className='' width={20} height={20} />
             ): (
                 <div className='h-8 w-8 bg-linear-to-br from-[#1E3A8A] to-blue-800 rounded-full flex items-center justify-center'>
                     <span className='text-white font-semibold text-sm'>
@@ -63,8 +63,8 @@ const ProfileDropdown = ({
                         {email}
                     </p>
                 </div>
-                <a onClick={() => router.push(`/dashboard/${id}/profile`)} className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer'>
-                    View Profile
+                <a onClick={() => router.push("/dashboard")} className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer'>
+                    Go to dashboard
                 </a>
                 <div>
                     <a 

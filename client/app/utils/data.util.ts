@@ -1,4 +1,4 @@
-import { BellRing, FileText, LineChart, Sparkles } from "lucide-react";
+import { BellRing, ChartColumnIncreasing, ClockAlert, FileText, LineChart, Loader, ReceiptText, Sparkles } from "lucide-react";
 
 export const billamMvpFeatures = [
   {
@@ -136,5 +136,97 @@ export const faqs = [
       "Create an account, add your business details, and start creating professional invoices in minutes.",
   },
 ];
+
+export const dashboardInsights = {
+  "metrics": {
+    "totalInvoices": 42,
+    "totalPaidInvoices": 29,
+    "totalOverdueInvoices": 5,
+    "totalPendingInvoices": 8,
+    "overdueRate": 0.31,
+    "paymentDelayTrend": "WORSENING",
+    "monthlyAverageDelays": [
+      {
+        "month": "2025-11",
+        "avgDelay": 3.2
+      },
+      {
+        "month": "2025-12",
+        "avgDelay": 5.6
+      },
+      {
+        "month": "2026-01",
+        "avgDelay": 8.1
+      }
+    ],
+    "repeatLatePayersCount": 3
+  },
+  "insights": {
+    "overallSummary": "Payment timelines are gradually extending, and several invoices remain overdue, which may begin to affect cash flow stability. With a few proactive adjustments — such as encouraging earlier payments, tightening terms for repeat late payers, and introducing timely follow-ups and reminders — you can strengthen collections and maintain healthy financial momentum.",
+    "risks": [
+      "Your average payment delay is increasing month over month, indicating weakening cash flow discipline.",
+      "A significant portion of your invoices remain unpaid beyond their due dates."
+    ],
+    "recommendations": [
+      "Introduce a 3–5% early payment discount to encourage faster settlements.",
+      "Require partial upfront deposits for clients with a history of delayed payments.",
+      "Follow up on overdue invoices within 48 hours instead of waiting until the end of the month."
+    ],
+    "automationIdeas": [
+      "Automatically send WhatsApp reminders 2 days before invoice due dates.",
+      "Flag repeat late-paying customers and apply stricter payment terms for future invoices.",
+      "Generate a weekly overdue invoices summary for quick review."
+    ]
+  }
+}
+
+export const DasboardInvoiceStats = [
+  {
+    title: "Total Invoices",
+    value: 21,
+    icon: ReceiptText,
+    className: 'bg-blue-50 text-blue-500'
+  },
+   {
+    title: "Paid Invoices",
+    value: 9,
+    icon: ChartColumnIncreasing,
+    className: 'bg-green-50 text-green-500'
+  },
+   {
+    title: "Pending Invoices",
+    value: 5,
+    icon: Loader,
+    className: 'bg-yellow-50 text-yellow-500'
+  },
+   {
+    title: "Overdue Invoices",
+    value: 7,
+    icon: ClockAlert,
+    className: 'bg-red-50 text-red-500'
+  }
+]
+
+export const overdueInvoices = [
+  {
+    invoiceNumber: "Invoice #INV-2032",
+    amountOverdue: 65000,
+    daysOverdue: 3,
+    supposedPaymentDate: "Jan 5, 2026"
+  },
+  {
+    invoiceNumber: "Invoice #INV-2033",
+    amountOverdue: 76000,
+    daysOverdue: 7,
+    supposedPaymentDate: "Jan 13, 2026"
+  },
+   {
+    invoiceNumber: "Invoice #INV-2034",
+    amountOverdue: 125000,
+    daysOverdue: 10,
+    supposedPaymentDate: "Feb 2, 2026"
+  }
+]
+
 
 

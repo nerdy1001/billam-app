@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.className} tracking-tight antialiased`}
+        className={`${inter.className} tracking-tight antialiased text-[#3c3c3c]`}
       >
         <ReactQueryProvider>
           {children}

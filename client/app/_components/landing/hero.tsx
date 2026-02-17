@@ -16,7 +16,7 @@ const Hero = () => {
                 <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-blue-950 leading-tight mb-6">
                     Create professional invoices. Get paid faster.
                 </h1>
-                <p className="text-base sm:text-xl text-gray-700 mb-8 leading-relaxed max-w-3xl mx-auto">
+                <p className="leading-7 not-first:mt-6 text-base sm:text-xl text-gray-700 mb-8 max-w-3xl mx-auto">
                     Billam helps freelancers and small businesses create invoices from simple text, send smart payment reminders, and understand their cash flow — all with the power of AI.
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">

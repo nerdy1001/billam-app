@@ -57,6 +57,7 @@ model Business {
   logo    String?
 
   paymentMethods PaymentMethod[] @default([])
+  cardNumber String?
 
   timezone String @default("Africa/Douala")
 
@@ -120,6 +121,7 @@ model Invoice {
 
   issueDate DateTime
   dueDate   DateTime
+  paidDate  DateTime?
 
     // 🔒 Snapshot fields
   customerName  String
@@ -244,7 +246,6 @@ enum AccountStatus {
 }
 
 enum PaymentMethod {
-  CASH
   MTN_MOMO
   ORANGE_MONEY
   CARD

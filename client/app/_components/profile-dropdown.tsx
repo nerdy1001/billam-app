@@ -35,7 +35,7 @@ const ProfileDropdown = ({
             className='flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-50 transition-colors duration-200 cursor-pointer'
         >
             {avatar ? (
-                <Image src={avatar} alt='avatar' className='' width={20} height={20} />
+                <Image src={avatar} alt='avatar' className='rounded-md' width={35} height={35} />
             ): (
                 <div className='h-8 w-8 bg-linear-to-br from-[#1E3A8A] to-blue-800 rounded-full flex items-center justify-center'>
                     <span className='text-white font-semibold text-sm'>

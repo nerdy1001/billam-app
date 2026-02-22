@@ -26,7 +26,7 @@ const OverdueInvoiceCard = ({
                 <div className='bg-red-50 p-2 rounded-full w-fit'>
                     <div className='flex items-center gap-2'>
                         <ClockAlert size={20} className='text-red-500' />
-                        <p className='text-red-500 text-sm font-medium'>
+                        <p className='text-red-500 text-sm font-medium truncate'>
                             {daysOverdue} days overdue ({supposedPaymentDate})
                         </p>
                     </div>

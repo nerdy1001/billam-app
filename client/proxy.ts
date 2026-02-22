@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
-import { auth } from "./lib/auth";
+import { getServerSession } from "./app/utils/server-session.util";
 
 const protectedRoutes = ["/dashboard"];
 
 export async function proxy(req: NextRequest) {
 
   const { nextUrl } = req;
+  
   const sessionCookie = getSessionCookie(req);
-
-  const session = await auth.api.getSession(req);
+  const session = await getServerSession();
 
   const res = NextResponse.next();
 

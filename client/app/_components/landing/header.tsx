@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import ProfileDropdown from '../profile-dropdown';
 import { useRouter } from 'next/navigation';
-import { useSession } from '@/lib/auth-client';
+import { authClient, useSession } from '@/lib/auth-client';
 
 const Header = () => {
 
@@ -21,13 +21,22 @@ const Header = () => {
 
     const session = useSession();
 
+    console.log(session)
+
     const user = {
         name: "John Doe",
         email: "john.doe@example.com",
         avatar: ""
     }
-    const logout = () => {
+    const logout = async () => {
         // Implement logout logic
+        await authClient.signOut({
+            fetchOptions: {
+                onSuccess: () => {
+                    router.push("/")
+                }
+            }
+        })
     }
 
     useEffect(() => {
@@ -64,7 +73,7 @@ const Header = () => {
                     </a>
                 </div>
                 <div className='hidden lg:flex items-center space-x-4'>
-                   {session ? (
+                   {session.data ? (
                     <>
                         <ProfileDropdown
                             id={session.data?.user.id!}
@@ -123,24 +132,24 @@ const Header = () => {
                         FAQ
                     </a>
                     <div className='border-t border-gray-200 my-2'></div>
-                    {session ? (
-                        <div className='p-4'>
-                            <Button
-                                onClick={() => router.push("/dashboard")}
-                            >
-                                Go to Dashboard
-                            </Button>
-                        </div>
-                    ): (
-                        <>
-                            <Link href="/login" className='block px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 font-medium transition-colors duration-200'>
-                                Login
-                            </Link>
-                            <Link href="/signup" className='block w-full rounded-md text-left bg-linear-to-r from-blue-950 to-[#1E3A8A] hover:bg-gray-800 text-white px-4 py-3 font-medium transition-all duration-200'>
-                                Sign Up
-                            </Link>
-                        </>
-                    )}
+                        {session.data ? (
+                            <div className='p-4'>
+                                <Button
+                                    onClick={() => router.push("/dashboard")}
+                                >
+                                    Go to Dashboard
+                                </Button>
+                            </div>
+                        ): (
+                            <>
+                                <Link href="/login" className='block px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 font-medium transition-colors duration-200'>
+                                    Login
+                                </Link>
+                                <Link href="/signup" className='block w-full rounded-md text-left bg-linear-to-r from-blue-950 to-[#1E3A8A] hover:bg-gray-800 text-white px-4 py-3 font-medium transition-all duration-200'>
+                                    Sign Up
+                                </Link>
+                            </>
+                        )}
                 </div>
             </div>
         )}

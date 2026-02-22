@@ -23,3 +23,47 @@ export type BusinessRecommendations = {
   insights?: BusinessRecommendationInsights | null;
   error?: string;
 }
+
+export type InvoiceItem = {
+  description: string;
+  units: string;
+  price: string;
+};
+
+export type PaymentTerm = {
+  term: string;
+};
+
+export type PaymentMethod = "mobile_money" | "orange_money" | "credit_card";
+
+export type Invoice = {
+  // Sender
+  name: string;
+  email: string;
+  phoneNumber: string;
+  logo?: string;
+
+  // Client
+  clientName: string;
+  clientEmail?: string;
+  clientPhone: string;
+  clientAddress: string;
+
+  // Project
+  projectName: string;
+  issueDate: Date;
+  dueDate: Date;
+
+  // Invoice Details
+  items: InvoiceItem[];
+  paymentTerms: PaymentTerm[];
+  paymentMethods: PaymentMethod[];
+
+  // Conditional Payment Fields
+  mobileMoneyNumber?: string;
+  orangeMoneyNumber?: string;
+  cardNumber?: string;
+
+  notes?: string;
+};
+

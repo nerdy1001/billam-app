@@ -5,7 +5,6 @@ import { hashPassword, verifyPassword } from './argon2';
 import { sendEMailAction } from '@/app/actions/send-mail.action';
 import { verifyEmailTemplate } from '@/app/emails/verification-template';
 import { resetPasswordTemplate } from '@/app/emails/reset-template';
-import { customSession } from 'better-auth/plugins';
 
 const options = {
     database: prismaAdapter(prisma, {
@@ -34,7 +33,7 @@ const options = {
         autoSignInAfterVerification: true,
         sendVerificationEmail: async ({ user, url }) => {
             const link = new URL(url);
-            link.searchParams.set("callbackURL", "/auth/verify-email");
+            link.searchParams.set("callbackURL", "/onboarding/steps");
 
             await sendEMailAction({
                 to: user.email,

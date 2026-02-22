@@ -25,66 +25,56 @@ import {
 } from "@/components/ui/sidebar"
 import { useSession } from "@/lib/auth-client"
 import { Separator } from "./ui/separator"
+import { useParams, usePathname } from "next/navigation"
+import { dashboardRoutes } from "@/lib/routes"
 
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
-const data = {
-  teams: [
+  const params = useParams();
+  const pathName = usePathname();
+  const accountId = params.id as string;
+
+  const navMain = [
     {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
-  navMain: [
-    {
-      title: "Dasboard",
-      url: "/",
+      title: "Dashboard",
+      url: dashboardRoutes.base(accountId),
       icon: LayoutDashboard,
-      isActive: true,
+      isActive: pathName === dashboardRoutes.base(accountId)
     },
     {
       title: "Invoices",
-      url: "/invoices",
+      url: dashboardRoutes.invoices(accountId),
       icon: FileText,
+      isActive: pathName === dashboardRoutes.invoices(accountId)
     },
     {
-      title: "AI Insights",
-      url: "/ai-insights",
+      title: "Insights",
+      url: dashboardRoutes.aiInsights(accountId),
       icon: Brain,
+      isActive: pathName === dashboardRoutes.aiInsights(accountId)
     },
     {
       title: "Clients",
-      url: "/clients",
+      url: dashboardRoutes.clients(accountId),
       icon: UserRound,
+      isActive: pathName === dashboardRoutes.clients(accountId)
     },
     {
       title: "Settings",
-      url: "/settings",
+      url: dashboardRoutes.invoices(accountId),
       icon: Settings,
+      isActive: pathName === dashboardRoutes.settings(accountId)
     },
-  ],
-}
-
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  ]
 
   return (
     <Sidebar className="bg-white" collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher />
       </SidebarHeader>
       <Separator />
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navMain} />
       </SidebarContent>
       <SidebarFooter className="cursor-pointer lg:block hidden">
         <NavUser />

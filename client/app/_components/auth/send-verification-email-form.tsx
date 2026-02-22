@@ -47,7 +47,7 @@ const SendVerificationEmailForm = ({ error }: verificationFormProps) => {
         mutationFn: async ( data: verificationFormValue ) => {
             await sendVerificationEmail({
                 email: data.email,
-                callbackURL: "/auth/verify",
+                callbackURL: "/onboarding",
                 fetchOptions: {
                     onRequest: () => {
                         setIsPending(true);

@@ -53,11 +53,11 @@ model Business {
   ownerId String  @db.String
   name    String
   email   String?
-  phone   String?
+  phone1  String
+  phone2  String?
   logo    String?
-
-  paymentMethods PaymentMethod[] @default([])
-  cardNumber String?
+  businessType BusinessType
+  industryType IndustryType
 
   timezone String @default("Africa/Douala")
 
@@ -65,14 +65,35 @@ model Business {
   updatedAt DateTime @updatedAt
 
   owner     User       @relation(fields: [ownerId], references: [id])
+  paymentMethods BusinessPaymentMethod[]
   phoneNumbers   BusinessPhone[]               // 👈 NEW
   invoices  Invoice[]
-  customers Customer[]
+  clients Client[]
   insights  Insight[]
   businessInvoiceYearCounter BusinessInvoiceYearCounter[]
 
   @@index([ownerId])
 }
+
+model BusinessPaymentMethod {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  businessId  String   @db.ObjectId
+
+  method      PaymentMethod
+  value       String        // phone number OR card number
+  label       String?       // Optional display label (e.g. "MTN MoMo", "Visa Ending 4242")
+
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([method])
+}
+
 
 model BusinessPhone {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -92,7 +113,7 @@ model BusinessPhone {
 }
 
 
-model Customer {
+model Client {
   id         String  @id @default(auto()) @map("_id") @db.ObjectId
   businessId String  @db.ObjectId
   name       String
@@ -105,7 +126,7 @@ model Customer {
   business Business  @relation(fields: [businessId], references: [id])
   invoices Invoice[]
 
-  @@unique([businessId, email])
+  @@unique([businessId, phone])
   @@index([businessId])
   @@index([email])
 }
@@ -113,7 +134,7 @@ model Customer {
 model Invoice {
   id         String @id @default(auto()) @map("_id") @db.ObjectId
   businessId String @db.ObjectId
-  customerId String @db.ObjectId
+  clientId   String @db.ObjectId
   userId     String @db.String
 
   invoiceNo String
@@ -124,25 +145,25 @@ model Invoice {
   paidDate  DateTime?
 
     // 🔒 Snapshot fields
-  customerName  String
-  customerEmail String?
-  customerPhone String?
-  customerAddress String?
+  clientName  String
+  clientEmail String?
+  clientPhone String?
+  clientAddress String?
 
-  subtotal Float
-  tax      Float @default(0)
+  projectName String
+
   total    Float
 
-  paymentTerms String?
   notes String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   business Business      @relation(fields: [businessId], references: [id])
-  customer Customer      @relation(fields: [customerId], references: [id])
+  client   Client      @relation(fields: [clientId], references: [id])
   user     User          @relation(fields: [userId], references: [id])
   items    InvoiceItem[]
+  paymentTerms PaymentTerm[]
   payments Payment[]
 
   @@unique([businessId, invoiceNo])
@@ -153,13 +174,22 @@ model Invoice {
   @@index([businessId, dueDate])
 }
 
+model PaymentTerm {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  invoiceId   String @db.ObjectId
+  term String
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
+
+  @@index([invoiceId])
+}
+
 model InvoiceItem {
   id          String @id @default(auto()) @map("_id") @db.ObjectId
   invoiceId   String @db.ObjectId
   description String
-  quantity    Int
-  unitPrice   Float
-  total       Float
+  units    Int
+  price   Float
 
   invoice Invoice @relation(fields: [invoiceId], references: [id])
 
@@ -215,7 +245,7 @@ model Insight {
 
 enum InvoiceStatus {
   DRAFT
-  SENT
+  DUE
   OVERDUE
   PAID
   CANCELLED
@@ -229,8 +259,32 @@ enum UserRole {
 enum InsightType {
   CASHFLOW
   PAYMENT_DELAY
-  CUSTOMER_RISK
+  CLIENT_RISK
   GROWTH_OPPORTUNITY
+}
+
+enum BusinessType {
+  tech_startup
+  software_agency
+  design_agency
+  creative_agency
+  freelancer
+  solopreneur
+  ecommerce_business
+  consulting_firm
+}
+
+enum IndustryType {
+  technology
+  design
+  marketing
+  finance
+  education
+  healthcare
+  ecommerce
+  consulting
+  photography
+  other
 }
 
 enum InsightSeverity {
@@ -246,10 +300,9 @@ enum AccountStatus {
 }
 
 enum PaymentMethod {
-  MTN_MOMO
-  ORANGE_MONEY
-  CARD
-  BANK_TRANSFER
+  mobile_money
+  orange_money
+  credit_card
 }
 
 model Session {
@@ -275,6 +328,7 @@ model Account {
   providerId            String
   userId                String        @db.String
   user                  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isOnboarded           Boolean       @default(false)
   accessToken           String?
   refreshToken          String?
   idToken               String?

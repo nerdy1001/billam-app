@@ -1,4 +1,4 @@
-import { BellRing, ChartColumnIncreasing, ClockAlert, FileText, LineChart, Loader, ReceiptText, Sparkles } from "lucide-react";
+import { BellRing, ChartColumnIncreasing, ClockAlert, FileText, LineChart, Loader, ReceiptText, Sparkles, WandSparkles } from "lucide-react";
 
 export const billamMvpFeatures = [
   {
@@ -25,6 +25,30 @@ export const billamMvpFeatures = [
   {
     id: "ai-insights",
     icon: LineChart,
+    title: "AI-Powered Business Insights",
+    description:
+      "Billam analyzes your invoices and payments to highlight unpaid invoices, cash-flow risks, and opportunities to improve how you get paid — acting as a smart decision assistant for your business."
+  }
+];
+
+export const onboardingSidebarFeatures = [
+  {
+    id: "professional-invoices",
+    icon: FileText,
+    title: "Professional Invoice Creation",
+    description:
+      "Generate clean, professional invoices with your branding, clear breakdowns, and proper totals. Billam helps you present your business professionally — even if you’re just starting out."
+  },
+  {
+    id: "payment-reminders",
+    icon: BellRing,
+    title: "Smart Payment Reminders",
+    description:
+      "Billam helps you send polite, well-timed payment reminders via WhatsApp and email, so you don’t have to chase clients or feel uncomfortable asking to be paid."
+  },
+  {
+    id: "ai-insights",
+    icon: WandSparkles,
     title: "AI-Powered Business Insights",
     description:
       "Billam analyzes your invoices and payments to highlight unpaid invoices, cash-flow risks, and opportunities to improve how you get paid — acting as a smart decision assistant for your business."
@@ -226,6 +250,84 @@ export const overdueInvoices = [
     daysOverdue: 10,
     supposedPaymentDate: "Feb 2, 2026"
   }
+]
+
+export const businessTypeOptions = [
+  {
+    label: "Tech Startup",
+    value: "tech_startup"
+  },
+  {
+    label: "Software Agency",
+    value: "software_agency"
+  },
+  {
+    label: "Design Agency",
+    value: "design_agency"
+  },
+  {
+    label: "Freelancer",
+    value: "freelancer"
+  },
+  {
+    label: "Solopreneur",
+    value: "solopreneur"
+  },
+  {
+    label: "E-commerce",
+    value: "ecommerce_business"
+  },
+  {
+    label: "Creative Agency",
+    value: "creative_agency"
+  },
+  {
+    label: "Consulting Firm",
+    value: "consulting_firm"
+  },
+]
+
+export const industryTypeOptions = [
+  {
+    label: "Technology",
+    value: "technology"
+  },
+  {
+    label: "Design",
+    value: "design"
+  },
+  {
+    label: "Marketing",
+    value: "marketing"
+  },
+  {
+    label: "Finance",
+    value: "finance"
+  },
+  {
+    label: "Education",
+    value: "education"
+  },
+  {
+    label: "Healthcare",
+    value: "healthcare"
+  },
+  {
+    label: "Ecommerce",
+    value: "ecommerce"
+  },
+  {
+    label: "Consulting",
+    value: "consulting"
+  },
+  {
+    label: "Photography",
+    value: "photography"
+  },
+  {
+    label: "Other",
+    value: "other"
+  },
 ]
 
 

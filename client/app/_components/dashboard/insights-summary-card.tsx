@@ -19,7 +19,7 @@ const InsightsSummaryCard = ({
           <div className='flex items-center gap-4 md:justify-start justify-between'>
             <div className='flex items-center gap-1'>
               <Image height={30} width={30} src={'/ai.png'} alt='AI-insights' />
-              <h1 className='md:text-xl text-lg font-bold'>
+              <h1 className='md:text-xl text-lg font-bold tracking-tight bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent'>
                 AI Summary
               </h1>
             </div>

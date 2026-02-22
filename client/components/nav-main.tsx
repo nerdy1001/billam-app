@@ -12,6 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { useRouter } from "next/navigation"
 
 export function NavMain({
   items,
@@ -23,6 +24,9 @@ export function NavMain({
     isActive?: boolean
   }[]
 }) {
+
+  const router = useRouter();
+
   return (
     <SidebarGroup>
       <SidebarMenu>
@@ -35,7 +39,7 @@ export function NavMain({
           >
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title} className="cursor-pointer">
+                <SidebarMenuButton tooltip={item.title} className="cursor-pointer" onClick={() => router.push(item.url)} >
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                 </SidebarMenuButton>

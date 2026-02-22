@@ -1,337 +1,334 @@
-"use server";
+// "use server";
 
-import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+// import { auth } from "@/lib/auth";
+// import { prisma } from "@/lib/prisma";
+// import { invoiceSchema } from "@/lib/validations/invoice.validation";
+// import { revalidatePath } from "next/cache";
+// import z from "zod";
 
-type InvoiceItemInput = {
-  description: string;
-  quantity: number;
-  unitPrice: number;
-};
+// type InvoiceItemInput = {
+//   description: string;
+//   quantity: number;
+//   unitPrice: number;
+// };
 
-type CreateInvoiceInput = {
-  businessId: string;
-  clientName: string;
-  clientEmail: string;
-  clientPhone: string;
-  clientAddress: string;
-  userId: string;
-  issueDate: Date;
-  dueDate: Date;
-  tax?: number;
-  notes?: string;
-  items: InvoiceItemInput[];
-};
+// type CreateInvoiceInput = {
+//   businessId: string;
+//   clientName: string;
+//   clientEmail: string;
+//   clientPhone: string;
+//   clientAddress: string;
+//   userId: string;
+//   issueDate: Date;
+//   dueDate: Date;
+//   tax?: number;
+//   notes?: string;
+//   items: InvoiceItemInput[];
+// };
 
-type UpdateInvoiceInput = {
-  invoiceId: string;
+// type UpdateInvoiceInput = {
+//   invoiceId: string;
 
-  customer?: {
-    name: string;
-    email?: string;
-    phone?: string;
-  };
+//   customer?: {
+//     name: string;
+//     email?: string;
+//     phone?: string;
+//   };
 
-  issueDate?: Date;
-  dueDate?: Date;
-  tax?: number;
-  notes?: string;
+//   issueDate?: Date;
+//   dueDate?: Date;
+//   tax?: number;
+//   notes?: string;
 
-  items?: {
-    description: string;
-    quantity: number;
-    unitPrice: number;
-  }[];
-};
+//   items?: {
+//     description: string;
+//     quantity: number;
+//     unitPrice: number;
+//   }[];
+// };
 
-type DeleteInvoiceInput = {
-  invoiceId: string;
-};
-
-
-export async function createInvoiceAction(data: CreateInvoiceInput) {
-  try {
-
-    if (!data.items || data.items.length === 0) {
-      return { error: 'Invoice must contain at least one item' };
-    };
-
-    const customer = await prisma.customer.upsert({
-      where: {
-        businessId_email: {
-          businessId: data.businessId,
-          email: data.clientEmail,
-        },
-      },
-      update: {
-        name: data.clientName,
-        phone: data.clientPhone,
-      },
-      create: {
-        businessId: data.businessId,
-        name: data.clientName,
-        email: data.clientEmail,
-        phone: data.clientPhone,
-      },
-    });
+// type DeleteInvoiceInput = {
+//   invoiceId: string;
+// };
 
 
-    /**
-     * 1️⃣ Compute totals
-     */
-    const itemsWithTotals = data.items.map((item) => {
-      if (item.quantity <= 0 || item.unitPrice < 0) {
-        throw new Error("Invalid invoice item");
-      }
+// export async function createInvoiceAction(data: z.infer<typeof invoiceSchema>) {
 
-      return {
-        description: item.description,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        total: item.quantity * item.unitPrice,
-      };
-    });
+//   const session = await auth.api.getSession();
 
-    const subtotal = itemsWithTotals.reduce(
-      (sum, item) => sum + item.total,
-      0
-    );
+//   if (!session) {
+//     return { success: false, message: "Unauthorized Access"}
+//   }
 
-    const tax = data.tax ?? 0;
-    const total = subtotal + tax;
+//   try {
 
-    const year = data.issueDate.getFullYear();
+//     if (!data.items || data.items.length === 0) {
+//       return { error: 'Invoice must contain at least one item' };
+//     };
 
-    /**
-     * 2️⃣ Atomic transaction
-     */
-    const invoice = await prisma.$transaction(async (tx) => {
-      /**
-       * 2a️⃣ Ensure year counter exists
-       */
-      await tx.businessInvoiceYearCounter.upsert({
-        where: {
-          businessId_year: {
-            businessId: data.businessId,
-            year,
-          },
-        },
-        update: {},
-        create: {
-          businessId: data.businessId,
-          year,
-          nextNumber: 1,
-        },
-      });
+//     const newBusiness = await prisma.business.create({
+//       data: {
+//         ownerId: session.user.id,
+//         name: data.name,
+//         email: data.email,
+//         phone: data.phoneNumber,
+//         logo: data.logo,
+//         paymentMethods: data.paymentMethods,
+//         cardNumber: data.cardNumber,
+//       }
+//     })
 
-      /**
-       * 2b️⃣ Atomically increment counter
-       */
-      const counter = await tx.businessInvoiceYearCounter.update({
-        where: {
-          businessId_year: {
-            businessId: data.businessId,
-            year,
-          },
-        },
-        data: {
-          nextNumber: { increment: 1 },
-        },
-      });
+    
 
-      const sequence = counter.nextNumber - 1;
-      const paddedSequence = String(sequence).padStart(4, "0");
+//     const client = await prisma.client.upsert({
+//       where: {
+//         businessId_phone: {
+//           businessId: newBusiness.id,
+//           phone: data.clientPhone,
+//         },
+//       },
+//       update: {
+//         name: data.clientName,
+//         phone: data.clientPhone,
+//       },
+//       create: {
+//         businessId: newBusiness.id,
+//         name: data.clientName,
+//         email: data.clientEmail,
+//         phone: data.clientPhone,
+//       },
+//     });
 
-      const invoiceNo = `INV-${year}-${paddedSequence}`;
+//     const year = data.issueDate.getFullYear();
 
-      /**
-       * 2c️⃣ Create invoice
-       */
-      return tx.invoice.create({
-        data: {
-          businessId: data.businessId,
-          userId: data.userId,
-          customerId: customer.id,
+//     /**
+//      * 2️⃣ Atomic transaction
+//      */
+//     const invoice = await prisma.$transaction(async (tx) => {
+//       /**
+//        * 2a️⃣ Ensure year counter exists
+//        */
+//       await tx.businessInvoiceYearCounter.upsert({
+//         where: {
+//           businessId_year: {
+//             businessId: newBusiness.id,
+//             year,
+//           },
+//         },
+//         update: {},
+//         create: {
+//           businessId: newBusiness.id,
+//           year,
+//           nextNumber: 1,
+//         },
+//       });
 
-          invoiceNo,
-          status: 'DRAFT',
+//       /**
+//        * 2b️⃣ Atomically increment counter
+//        */
+//       const counter = await tx.businessInvoiceYearCounter.update({
+//         where: {
+//           businessId_year: {
+//             businessId: newBusiness.id,
+//             year,
+//           },
+//         },
+//         data: {
+//           nextNumber: { increment: 1 },
+//         },
+//       });
 
-          customerName: customer.name,
-          customerEmail: customer.email,
-          customerPhone: customer.phone,
-          customerAddress: customer.address,
+//       const sequence = counter.nextNumber - 1;
+//       const paddedSequence = String(sequence).padStart(4, "0");
 
-          issueDate: data.issueDate,
-          dueDate: data.dueDate,
+//       const invoiceNo = `INV-${year}-${paddedSequence}`;
 
-          subtotal,
-          tax,
-          total,
-          notes: data.notes,
+//       /**
+//        * 2c️⃣ Create invoice
+//        */
+//       return tx.invoice.create({
+//         data: {
+//           businessId: newBusiness.id,
+//           userId: session.user.id,
+//           clientId: client.id,
 
-          items: {
-            create: itemsWithTotals,
-          },
-        },
-        include: { items: true },
-      });
-    });
+//           invoiceNo,
+//           status: 'DRAFT',
 
-    return { success: true, invoice };
-  } catch (error: any) {
-    console.error("[CREATE_INVOICE_ERROR]", error);
-    return { success: false, error: error.message };
-  }
-}
+//           clientName: client.name,
+//           clientEmail: client.email,
+//           clientPhone: client.phone,
+//           clientAddress: client.address,
 
-export async function getBusinessInvoices(businessId: string) {
-  if (!businessId) {
-    return { error: 'BusinessId is required'};
-  };
+//           issueDate: data.issueDate,
+//           dueDate: data.dueDate,
 
-  const invoices = await prisma.invoice.findMany({
-    where: {
-      businessId,
-    },
-    include: {
-      customer: true,
-      items: true,
-      payments: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+//           total,
+//           notes: data.notes,
 
-  return invoices;
-}
+//           items: {
+//             create: data.items,
+//           },
+//         },
+//         include: { items: true },
+//       });
+//     });
 
-export async function getBusinessInvoicesByStatus(
-  businessId: string,
-  status: "DRAFT" | "SENT" | "PAID" | "OVERDUE"
-) {
-  return prisma.invoice.findMany({
-    where: {
-      businessId,
-      status,
-    },
-    orderBy: { createdAt: "desc" },
-  });
-}
+//     return { success: true, invoice };
+//   } catch (error: any) {
+//     console.error("[CREATE_INVOICE_ERROR]", error);
+//     return { success: false, error: error.message };
+//   }
+// }
 
-export async function updateInvoiceAction(input: UpdateInvoiceInput) {
-  const invoice = await prisma.invoice.findUnique({
-    where: { id: input.invoiceId },
-    include: { items: true },
-  });
+// export async function getBusinessInvoices(businessId: string) {
+//   if (!businessId) {
+//     return { error: 'BusinessId is required'};
+//   };
 
-  if (!invoice) {
-    return { error: "Invoice not found" };
-  }
+//   const invoices = await prisma.invoice.findMany({
+//     where: {
+//       businessId,
+//     },
+//     include: {
+//       client: true,
+//       items: true,
+//       payments: true,
+//     },
+//     orderBy: {
+//       createdAt: "desc",
+//     },
+//   });
 
-  if (invoice.status !== "DRAFT") {
-    return { error: "Only draft invoices can be edited" };
-  }
+//   return invoices;
+// }
 
-  // 📦 Decide which items to use
-  const itemsToUse = input.items ?? invoice.items;
+// export async function getBusinessInvoicesByStatus(
+//   businessId: string,
+//   status: "DRAFT" | "SENT" | "PAID" | "OVERDUE"
+// ) {
+//   return prisma.invoice.findMany({
+//     where: {
+//       businessId,
+//       status,
+//     },
+//     orderBy: { createdAt: "desc" },
+//   });
+// }
 
-  if (!itemsToUse.length) {
-    return { error: "Invoice must have at least one item" };
-  }
+// export async function updateInvoiceAction(input: UpdateInvoiceInput) {
+//   const invoice = await prisma.invoice.findUnique({
+//     where: { id: input.invoiceId },
+//     include: { items: true },
+//   });
 
-  const subtotal = itemsToUse.reduce(
-    (sum, item) => sum + item.quantity * item.unitPrice,
-    0
-  );
+//   if (!invoice) {
+//     return { error: "Invoice not found" };
+//   }
 
-  const tax = input.tax ?? invoice.tax;
-  const total = subtotal + tax;
+//   if (invoice.status !== "DRAFT") {
+//     return { error: "Only draft invoices can be edited" };
+//   }
 
-  await prisma.$transaction(async (tx) => {
-    if (input.items) {
-      await tx.invoiceItem.deleteMany({
-        where: { invoiceId: invoice.id },
-      });
+//   // 📦 Decide which items to use
+//   const itemsToUse = input.items ?? invoice.items;
 
-      await tx.invoiceItem.createMany({
-        data: input.items.map((item) => ({
-          invoiceId: invoice.id,
-          description: item.description,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          total: item.quantity * item.unitPrice,
-        })),
-      });
-    }
+//   if (!itemsToUse.length) {
+//     return { error: "Invoice must have at least one item" };
+//   }
 
-    await tx.invoice.update({
-      where: { id: invoice.id },
-      data: {
-        issueDate: input.issueDate ?? invoice.issueDate,
-        dueDate: input.dueDate ?? invoice.dueDate,
-        notes: input.notes ?? invoice.notes,
-        tax,
-        subtotal,
-        total,
+//   const subtotal = itemsToUse.reduce(
+//     (sum, item) => sum + item.quantity * item.unitPrice,
+//     0
+//   );
 
-        ...(input.customer && {
-          customerName: input.customer.name,
-          customerEmail: input.customer.email,
-          customerPhone: input.customer.phone,
-        }),
-      },
-    });
-  });
+//   const tax = input.tax ?? invoice.tax;
+//   const total = subtotal + tax;
 
-  return { success: true };
-}
+//   await prisma.$transaction(async (tx) => {
+//     if (input.items) {
+//       await tx.invoiceItem.deleteMany({
+//         where: { invoiceId: invoice.id },
+//       });
 
-export async function deleteInvoice(input: DeleteInvoiceInput) {
-  try {
-    if (!input.invoiceId) {
-      return {
-        success: false,
-        error: 'Missing invoiceId',
-      };
-    }
+//       await tx.invoiceItem.createMany({
+//         data: input.items.map((item) => ({
+//           invoiceId: invoice.id,
+//           description: item.description,
+//           quantity: item.quantity,
+//           unitPrice: item.unitPrice,
+//           total: item.quantity * item.unitPrice,
+//         })),
+//       });
+//     }
 
-    // 1️⃣ Check invoice existence & ownership
-    const invoice = await prisma.invoice.findFirst({
-      where: {
-        id: input.invoiceId,
-      },
-      select: { id: true },
-    });
+//     await tx.invoice.update({
+//       where: { id: invoice.id },
+//       data: {
+//         issueDate: input.issueDate ?? invoice.issueDate,
+//         dueDate: input.dueDate ?? invoice.dueDate,
+//         notes: input.notes ?? invoice.notes,
+//         tax,
+//         subtotal,
+//         total,
 
-    if (!invoice) {
-      return {
-        success: false,
-        error: 'Invoice not found or access denied',
-      };
-    }
+//         ...(input.customer && {
+//           customerName: input.customer.name,
+//           customerEmail: input.customer.email,
+//           customerPhone: input.customer.phone,
+//         }),
+//       },
+//     });
+//   });
 
-    // 2️⃣ Delete invoice
-    await prisma.invoice.delete({
-      where: {
-        id: input.invoiceId,
-      },
-    });
+//   return { success: true };
+// }
 
-    // 3️⃣ Revalidate affected pages
-    revalidatePath('/dashboard/invoices');
-    revalidatePath(`/dashboard/invoices/${input.invoiceId}`);
+// export async function deleteInvoice(input: DeleteInvoiceInput) {
+//   try {
+//     if (!input.invoiceId) {
+//       return {
+//         success: false,
+//         error: 'Missing invoiceId',
+//       };
+//     }
 
-    return {
-      success: true,
-    };
-  } catch (error) {
-    console.error('[DELETE_INVOICE_ERROR]', error);
+//     // 1️⃣ Check invoice existence & ownership
+//     const invoice = await prisma.invoice.findFirst({
+//       where: {
+//         id: input.invoiceId,
+//       },
+//       select: { id: true },
+//     });
 
-    return {
-      success: false,
-      error: 'Failed to delete invoice',
-    };
-  }
-}
+//     if (!invoice) {
+//       return {
+//         success: false,
+//         error: 'Invoice not found or access denied',
+//       };
+//     }
+
+//     // 2️⃣ Delete invoice
+//     await prisma.invoice.delete({
+//       where: {
+//         id: input.invoiceId,
+//       },
+//     });
+
+//     // 3️⃣ Revalidate affected pages
+//     revalidatePath('/dashboard/invoices');
+//     revalidatePath(`/dashboard/invoices/${input.invoiceId}`);
+
+//     return {
+//       success: true,
+//     };
+//   } catch (error) {
+//     console.error('[DELETE_INVOICE_ERROR]', error);
+
+//     return {
+//       success: false,
+//       error: 'Failed to delete invoice',
+//     };
+//   }
+// }
 

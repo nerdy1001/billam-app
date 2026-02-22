@@ -25,7 +25,7 @@ export default function EmailSentPage() {
           <div className="flex flex-col space-y-8 justify-center max-w-md mx-auto my-auto w-full">
             <div className="flex flex-col space-y-4">
               <p className="text-xl text-center font-normal text-gray-700">
-                We sent you an email with a link to confirm it is you. Once you click on it, you will be redirected to your dashboard.
+                We sent you an email with a link to confirm it is you.
               </p>
               <div className="flex items-center gap-2 p-4 bg-red-100 rounded-md">
                 <CircleAlert className="text-red-500" size={20} />

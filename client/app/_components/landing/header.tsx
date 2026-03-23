@@ -142,10 +142,10 @@ const Header = () => {
                             </div>
                         ): (
                             <>
-                                <Link href="/login" className='block px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 font-medium transition-colors duration-200'>
+                                <Link href="/auth/login" className='block px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 font-medium transition-colors duration-200'>
                                     Login
                                 </Link>
-                                <Link href="/signup" className='block w-full rounded-md text-left bg-linear-to-r from-blue-950 to-[#1E3A8A] hover:bg-gray-800 text-white px-4 py-3 font-medium transition-all duration-200'>
+                                <Link href="/auth/signup" className='block w-full rounded-md text-left bg-linear-to-r from-blue-950 to-[#1E3A8A] hover:bg-gray-800 text-white px-4 py-3 font-medium transition-all duration-200'>
                                     Sign Up
                                 </Link>
                             </>

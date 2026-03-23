@@ -1,5 +1,5 @@
 // app/api/clients/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/app/utils/server-session.util";
 import { InvoiceStatus } from "@/generated/prisma";
@@ -72,7 +72,7 @@ function classifyHealth(
 
 // ── Route handler ────────────────────────────────────────────────────────
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
 

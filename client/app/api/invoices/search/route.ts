@@ -1,12 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
-import { Prisma } from "@prisma/client";
 import { getServerSession } from "@/app/utils/server-session.util";
 import { InvoiceStatus } from "@/generated/prisma";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
 

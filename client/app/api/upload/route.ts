@@ -43,7 +43,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       });
     }
   } catch (error) {
-    NextResponse.json({
+    return NextResponse.json({
       msg: "Error in fileupload route",
       statusCode: 500,
     });

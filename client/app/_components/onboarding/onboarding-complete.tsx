@@ -5,9 +5,7 @@ interface OnboardingCompleteProps {
   businessId?: string;
 }
 
-const OnboardingComplete = ({
-  businessId
-}: OnboardingCompleteProps) => {
+const OnboardingComplete = () => {
 
   const router = useRouter();
 

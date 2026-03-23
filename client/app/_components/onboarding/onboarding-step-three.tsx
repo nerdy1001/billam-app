@@ -1,11 +1,9 @@
 import { OnboardingFormValues, PaymentMethodType } from "@/lib/validations/onboarding.validation";
 import { UseFormReturn, useFieldArray } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
-import { paymentMethodEnum } from "@/lib/validations/onboarding.validation";
 import { Input } from "@/components/ui/input";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import OnboardingHeader from "./onboarding-header";
 
 interface Props {

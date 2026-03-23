@@ -47,12 +47,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       icon: FileText,
       isActive: pathName === dashboardRoutes.invoices(accountId)
     },
-    {
-      title: "Insights",
-      url: dashboardRoutes.aiInsights(accountId),
-      icon: Brain,
-      isActive: pathName === dashboardRoutes.aiInsights(accountId)
-    },
+    // {
+    //   title: "Insights",
+    //   url: dashboardRoutes.aiInsights(accountId),
+    //   icon: Brain,
+    //   isActive: pathName === dashboardRoutes.aiInsights(accountId)
+    // },
     {
       title: "Clients",
       url: dashboardRoutes.clients(accountId),
@@ -61,18 +61,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
     {
       title: "Settings",
-      url: dashboardRoutes.invoices(accountId),
+      url: dashboardRoutes.settings(accountId),
       icon: Settings,
       isActive: pathName === dashboardRoutes.settings(accountId)
     },
   ]
 
   return (
-    <Sidebar className="bg-white" collapsible="icon" {...props}>
+    <Sidebar className="bg-[#0D1117] text-white" collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher />
       </SidebarHeader>
-      <Separator />
+      <Separator className="bg-[#3d4e6870]" />
       <SidebarContent>
         <NavMain items={navMain} />
       </SidebarContent>

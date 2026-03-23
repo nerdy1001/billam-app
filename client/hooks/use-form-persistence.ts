@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
 
-const STORAGE_KEY = "onboarding-form-data";
+const STORAGE_KEY = "billam-form-data";
 
 export function useFormPersistence<T extends Record<string, any>>(
   form: UseFormReturn<T>,

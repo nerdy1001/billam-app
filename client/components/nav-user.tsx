@@ -60,11 +60,11 @@ export function NavUser() {
             >
               <Avatar className="h-8 w-8 rounded-full">
                 <AvatarImage src={session.data?.user.image!} alt={session.data?.user.name!} />
-                <AvatarFallback className="rounded-full">CN</AvatarFallback>
+                <AvatarFallback className="rounded-full">{session.data?.user.name?.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div className="flex-1 text-left text-sm leading-tight lg:grid hidden">
                 <span className="truncate font-medium">{session.data?.user.name!}</span>
-                <span className="truncate text-xs">{session.data?.user.email!}</span>
+                <span className="truncate text-xs text-slate-400">{session.data?.user.email!}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4 lg:block hidden" />
             </div>

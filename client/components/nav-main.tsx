@@ -39,7 +39,7 @@ export function NavMain({
           >
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title} className="cursor-pointer" onClick={() => router.push(item.url)} >
+                <SidebarMenuButton tooltip={item.title} className="cursor-pointer font-medium text-gray-400 hover:bg-[#3d4e6870] hover:text-white" onClick={() => router.push(item.url)} >
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                 </SidebarMenuButton>

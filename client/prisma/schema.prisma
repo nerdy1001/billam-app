@@ -18,6 +18,7 @@ datasource db {
 model User {
   id        String   @id @map("_id") @db.String
   email String   @unique
+  phoneNumber String?
   name  String?
   image String?
   role  UserRole @default(USER)
@@ -55,6 +56,7 @@ model Business {
   email   String?
   phone1  String
   phone2  String?
+  address String?
   logo    String?
   businessType BusinessType
   industryType IndustryType
@@ -145,14 +147,12 @@ model Invoice {
   paidDate  DateTime?
 
     // 🔒 Snapshot fields
-  clientName  String
+  clientName  String?
   clientEmail String?
   clientPhone String?
   clientAddress String?
 
   projectName String
-
-  total    Float
 
   notes String?
 
@@ -160,7 +160,7 @@ model Invoice {
   updatedAt DateTime @updatedAt
 
   business Business      @relation(fields: [businessId], references: [id])
-  client   Client      @relation(fields: [clientId], references: [id])
+  client   Client     @relation(fields: [clientId], references: [id])
   user     User          @relation(fields: [userId], references: [id])
   items    InvoiceItem[]
   paymentTerms PaymentTerm[]

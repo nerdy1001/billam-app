@@ -1,7 +1,7 @@
 // lib/gemini.ts
 import { GoogleGenAI } from '@google/genai';
 import { prisma } from './prisma';
-import { Invoice } from '@/generated/prisma';
+import { Invoice, InvoiceItem } from '@/generated/prisma';
 import { Medium, Tone } from '@/app/actions/ai.actions';
 
 const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
@@ -45,15 +45,25 @@ export function parseInvoiceFromTextPrompt (text: string) {
     The JSON object MUST have the following structure:
     {
       "clientName": "string"
-      "email": "string(if available)"
-      "address": "string"(if available)"
-      "items": [
+      "clientEmail": "string(if available or empty string if not available)"
+      "clientPhoneNumber": "string"(if available or empty string if not available)"
+      "clientAddress": "string"(if available or empty string if not available)"
+      "projectName": "string"(if available or empty string if not available)"
+      "issueDate": "string in ISO format (YYYY-MM-DD)"(if available or empty string if not available)
+      "dueDate": "string in ISO format (YYYY-MM-DD)"(if available or empty string if not available)
+      "paymentTerms": [
         {
-          "name": "string"
-          "quantity": "number"
-          "unitPrice": "number"
+          "term" : "string"(if available or empty string if not available)
         }
       ]
+      "items": [
+        {
+          "description": "string"
+          "units": "number"
+          "price": "number"
+        }
+      ]
+      "notes": "string"(if available or empty string if not available)
     }
     
     Here is the text to parse:
@@ -89,23 +99,38 @@ export function buildRecommendationPrompt(input: BusinessRecommendationMetrics) 
     - Output JSON only with this shape:
 
     {
-      "overallSummary": string,
-      "risks": string[],
-      "recommendations": string[],
-      "automationIdeas": string[]
+      "overallSummary": "string",
+      "risks": [
+        {
+          "title": "string",
+          "description": "string"
+        }
+      ],
+      "recommendations": [
+        {
+          "title": "string",
+          "description": "string"
+        }
+      ],
+      "automationIdeas": [
+        {
+          "title": "string",
+          "description": "string"
+        }
+      ],
     }
 
   `
 }
 
-export function generateReminderPrompt(invoice: Invoice, tone: Tone, medium: Medium) {
+export function generateReminderPrompt(invoice: Invoice & { items: InvoiceItem[]}, tone: Tone, medium: Medium) {
   return `
     You are a ${tone} accounting assitant. Your task is to write a ${medium} message to a client about an overdue or upcoming invoice payment.
 
     Use the following details to personalize the ${medium} message:
-    - Client Name: ${invoice.customerName}
+    - Client Name: ${invoice.clientName}
     - Invoice Number: ${invoice.invoiceNo}
-    - Amount Due: ${invoice.subtotal.toFixed(2)}
+    - Amount Due: ${invoice.items.reduce((sum, item) => sum + item.units * item.price, 0)}
     - Due Date: ${new Date(invoice.dueDate).toLocaleDateString()}
 
     The tone should be ${tone} but make sure you keep it clear and most importantly, respectful. Keep it concise.

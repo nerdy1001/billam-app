@@ -2,8 +2,8 @@ import { z } from "zod";
 
 export const invoiceItemSchema = z.object({
   description: z.string().min(1, "Description is required"),
-  units: z.string().min(1),
-  price: z.string().min(0),
+  units: z.coerce.number<number>().min(1),
+  price: z.coerce.number<number>().min(0),
 });
 
 export const paymentTermSchema = z.object({
@@ -12,10 +12,10 @@ export const paymentTermSchema = z.object({
 
 export const invoiceSchema = z.object({
 
-    name: z.string().min(2, { message: 'Your must be at least three(3) characters long'}),
-    email: z.email({ message: 'Invalid email address' }).nonempty('Email is required'),
-    phoneNumber: z.string().min(9, { message: 'Phone number must be at least nine(09) characters long'}),
-    logo: z.union([z.instanceof(File), z.string()]).optional(),
+    // name: z.string().min(2, { message: 'Your must be at least three(3) characters long'}),
+    // email: z.email({ message: 'Invalid email address' }).nonempty('Email is required'),
+    // phoneNumber: z.string().min(9, { message: 'Phone number must be at least nine(09) characters long'}),
+    // logo: z.union([z.instanceof(File), z.string()]).optional(),
 
     clientName: z.string().min(2, { message: 'Client name must be at least three(3) characters long'}),
     clientEmail:  z.email({ message: 'Invalid email address' }).nonempty('Email is required').optional(),
@@ -29,40 +29,15 @@ export const invoiceSchema = z.object({
     items: z.array(invoiceItemSchema).min(1),
     paymentTerms: z.array(paymentTermSchema).min(1),
 
-    paymentMethods: z
-    .array(z.enum(["mobile_money", "orange_money", "credit_card"]))
-    .min(1, "Select at least one payment method"),
+    // paymentMethods: z
+    // .array(z.enum(["mobile_money", "orange_money", "credit_card"]))
+    // .min(1, "Select at least one payment method"),
 
 
-    mobileMoneyNumber: z.string().optional(),
-    orangeMoneyNumber: z.string().optional(),
-    cardNumber: z.string().optional(),
+    // mobileMoneyNumber: z.string().optional(),
+    // orangeMoneyNumber: z.string().optional(),
+    // cardNumber: z.string().optional(),
 
     notes: z.string().optional(),
-}).superRefine((data, ctx) => {
-  if (data.paymentMethods.includes("mobile_money") && !data.mobileMoneyNumber) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Mobile Money number is required",
-      path: ["mobileMoneyNumber"],
-    });
-  }
-
-  if (data.paymentMethods.includes("orange_money") && !data.orangeMoneyNumber) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Orange Money number is required",
-      path: ["orangeMoneyNumber"],
-    });
-  }
-
-  if (data.paymentMethods.includes("credit_card") && !data.cardNumber) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Credit card number is required",
-      path: ["cardNumber"],
-    });
-  }
 })
-
 export type InvoiceFormValues = z.infer<typeof invoiceSchema>;

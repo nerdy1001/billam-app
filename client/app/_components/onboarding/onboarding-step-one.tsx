@@ -16,7 +16,7 @@ const OnboardingStepOne = ({
     <div className='flex flex-col space-y-16'>
       <OnboardingHeader
         title='Can you tell us about your company ?'
-        description='This will help us tailor your invoice and insights experience accordingly '
+        description='This will help us tailor your invoice and insights experience accordingly. You can always edit this later in settings.'
         step={1}
       />
       <div className='flex flex-col space-y-8'>

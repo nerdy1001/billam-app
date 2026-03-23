@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Google_Sans, Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { ReactQueryProvider } from "./providers/react-query-provider";
+import { ReduxProvider } from "./providers/redux-provider";
 
-const inter = Inter({
+const inter = Google_Sans({
   variable: "--font-inter-tight",
   subsets: ["latin"],
 });
@@ -25,8 +26,10 @@ export default function RootLayout({
         className={`${inter.className} tracking-tight antialiased text-[#3c3c3c]`}
       >
         <ReactQueryProvider>
-          {children}
-          <Toaster richColors />
+          <ReduxProvider>
+            {children}
+            <Toaster richColors />
+          </ReduxProvider>
         </ReactQueryProvider>
       </body>
     </html>

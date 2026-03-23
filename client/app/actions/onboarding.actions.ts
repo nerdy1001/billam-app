@@ -22,6 +22,7 @@ export async function createBusiness(data: OnboardingFormValues) {
                 email: data.businessEmail,
                 phone1: data.phoneNumber1,
                 phone2: data.phoneNumber2,
+                address: data.businessAddress,
                 logo: data.logo as string,
                 businessType: data.businessType,
                 industryType: data.industry,

@@ -94,7 +94,7 @@ export function ImageDropzone({
       <div
         {...getRootProps()}
         className={cn(
-          "relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer transition-colors",
+          "relative flex flex-col items-center justify-center w-full h-50 border-2 border-dashed bg-white rounded-lg cursor-pointer transition-colors",
           isDragActive ? "border-primary bg-primary/5" : "border-muted-foreground/25",
           isDragReject ? "border-destructive bg-destructive/5" : "hover:bg-accent",
         )}

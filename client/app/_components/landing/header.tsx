@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { FileText, Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import ProfileDropdown from '../profile-dropdown';
+import ProfileDropdown from './profile-dropdown';
 import { useRouter } from 'next/navigation';
 import { authClient, useSession } from '@/lib/auth-client';
 

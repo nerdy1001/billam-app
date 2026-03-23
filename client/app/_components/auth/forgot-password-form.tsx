@@ -1,19 +1,18 @@
 "use client";
 
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { requestPasswordReset, sendVerificationEmail } from '@/lib/auth-client';
+import { requestPasswordReset } from '@/lib/auth-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { FileText, Loader2, Mail } from 'lucide-react';
 import { Manrope } from 'next/font/google';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import z, { email } from 'zod';
+import z from 'zod';
 
 const logoFont = Manrope({ subsets: ['latin'], weight: '700' });
 
@@ -27,9 +26,6 @@ export type forgotPasswordFormValue = z.infer<typeof forgotPasswordFormSchema>;
 const ForgotPasswordForm = () => {
 
     const [isPending, setIsPending] = useState(false);
-
-    const router = useRouter();
-
 
     const form = useForm<forgotPasswordFormValue>({
         resolver: zodResolver(forgotPasswordFormSchema),

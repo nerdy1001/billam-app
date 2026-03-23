@@ -1,0 +1,353 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider   = "prisma-client-js"
+  output     = "../generated/prisma"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @map("_id") @db.String
+  email       String   @unique
+  phoneNumber String?
+  name        String?
+  image       String?
+  role        UserRole @default(USER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  businesses              Business[]
+  invoices                Invoice[] // emailVerified Boolean    @default(false)
+  sessions                Session[]
+  accounts                Account[]
+  emailVerificationTokens EmailVerificationToken[]
+
+  emailVerified Boolean @default(false)
+
+  @@map("user")
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.String
+  tokenHash String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([tokenHash])
+}
+
+model Business {
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId      String       @db.String
+  name         String
+  email        String?
+  phone1       String
+  phone2       String?
+  address      String?
+  logo         String?
+  businessType BusinessType
+  industryType IndustryType
+
+  timezone String @default("Africa/Douala")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner                      User                         @relation(fields: [ownerId], references: [id])
+  paymentMethods             BusinessPaymentMethod[]
+  phoneNumbers               BusinessPhone[] // 👈 NEW
+  invoices                   Invoice[]
+  clients                    Client[]
+  insights                   Insight[]
+  businessInvoiceYearCounter BusinessInvoiceYearCounter[]
+
+  @@index([ownerId])
+}
+
+model BusinessPaymentMethod {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  businessId String @db.ObjectId
+
+  method PaymentMethod
+  value  String // phone number OR card number
+  label  String? // Optional display label (e.g. "MTN MoMo", "Visa Ending 4242")
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@index([method])
+}
+
+model BusinessPhone {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  businessId String  @db.ObjectId
+  phone      String
+  label      String? // e.g. "Main", "WhatsApp", "MoMo", "Support"
+  isPrimary  Boolean @default(false)
+  isVerified Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, phone]) // no duplicate numbers per business
+  @@index([businessId])
+}
+
+model Client {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  businessId String  @db.ObjectId
+  name       String
+  email      String?
+  phone      String?
+  address    String?
+
+  createdAt DateTime @default(now())
+
+  business Business  @relation(fields: [businessId], references: [id])
+  invoices Invoice[]
+
+  @@unique([businessId, phone])
+  @@index([businessId])
+  @@index([email])
+}
+
+model Invoice {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  businessId String @db.ObjectId
+  clientId   String @db.ObjectId
+  userId     String @db.String
+
+  invoiceNo String
+  status    InvoiceStatus @default(DRAFT)
+
+  issueDate DateTime
+  dueDate   DateTime
+  paidDate  DateTime?
+
+  // 🔒 Snapshot fields
+  clientName    String?
+  clientEmail   String?
+  clientPhone   String?
+  clientAddress String?
+
+  projectName String
+
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  business     Business      @relation(fields: [businessId], references: [id])
+  client       Client        @relation(fields: [clientId], references: [id])
+  user         User          @relation(fields: [userId], references: [id])
+  items        InvoiceItem[]
+  paymentTerms PaymentTerm[]
+  payments     Payment[]
+
+  @@unique([businessId, invoiceNo])
+  @@index([businessId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([businessId, status])
+  @@index([businessId, dueDate])
+}
+
+model PaymentTerm {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  invoiceId String @db.ObjectId
+  term      String
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
+
+  @@index([invoiceId])
+}
+
+model InvoiceItem {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  invoiceId   String @db.ObjectId
+  description String
+  units       Int
+  price       Float
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
+
+  @@index([invoiceId])
+}
+
+model BusinessInvoiceYearCounter {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  businessId String @db.ObjectId
+  year       Int
+  nextNumber Int    @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id])
+
+  @@unique([businessId, year])
+  @@index([businessId])
+  @@map("business_invoice_year_counter")
+}
+
+model Payment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  invoiceId String   @db.ObjectId
+  amount    Float
+  method    String
+  paidAt    DateTime
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
+
+  @@index([invoiceId])
+  @@index([paidAt])
+}
+
+model Insight {
+  id         String          @id @default(auto()) @map("_id") @db.ObjectId
+  businessId String          @db.ObjectId
+  type       InsightType
+  title      String
+  message    String
+  severity   InsightSeverity
+
+  createdAt DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id])
+
+  @@index([businessId])
+  @@index([severity])
+  @@index([businessId, severity])
+}
+
+enum InvoiceStatus {
+  DRAFT
+  DUE
+  OVERDUE
+  PAID
+  CANCELLED
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum InsightType {
+  CASHFLOW
+  PAYMENT_DELAY
+  CLIENT_RISK
+  GROWTH_OPPORTUNITY
+}
+
+enum BusinessType {
+  tech_startup
+  software_agency
+  design_agency
+  creative_agency
+  freelancer
+  solopreneur
+  ecommerce_business
+  consulting_firm
+}
+
+enum IndustryType {
+  technology
+  design
+  marketing
+  finance
+  education
+  healthcare
+  ecommerce
+  consulting
+  photography
+  other
+}
+
+enum InsightSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum AccountStatus {
+  PENDING // created but email not verified
+  ACTIVE // email verified, full access
+  SUSPENDED // banned / restricted
+}
+
+enum PaymentMethod {
+  mobile_money
+  orange_money
+  credit_card
+}
+
+model Session {
+  id        String   @id @map("_id")
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+
+  userId String @db.String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @map("_id")
+  accountId             String
+  providerId            String
+  userId                String    @db.String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isOnboarded           Boolean   @default(false)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id @map("_id")
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}

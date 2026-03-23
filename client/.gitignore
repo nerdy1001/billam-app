@@ -151,7 +151,4 @@ Dockerfile.dev
 .npmrc
 Jenkinsfile
 
-generated
-/lib/generated/prisma
 
-/generated/prisma

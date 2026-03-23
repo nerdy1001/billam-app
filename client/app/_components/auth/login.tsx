@@ -22,7 +22,6 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { getCurrentBusiness } from "@/app/utils/get-current-business.util";
 
 const logoFont = Manrope({ subsets: ['latin'], weight: '700' });
 
@@ -42,8 +41,6 @@ const loginSchema = z.object({
 export type loginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
-
-  const router = useRouter();
 
   const form = useForm<loginFormValues>({
     resolver: zodResolver(loginSchema),
